@@ -8,6 +8,7 @@ export const tweetRouter = createTRPCRouter({
       const { prisma, session } = ctx;
       const { text } = input;
       const userId = session.user.id;
+      console.log("This is session:", session.user);
       return prisma.tweet.create({
         data: {
           text,

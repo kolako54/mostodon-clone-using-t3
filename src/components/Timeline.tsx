@@ -92,7 +92,7 @@ const Timeline = () => {
       fetchNextPage();
     }
   }, [scrollPosition]);
-  console.log({ scrollPosition });
+  // console.log({ scrollPosition });
   return (
     <div>
       <CreateTweet />
@@ -100,12 +100,7 @@ const Timeline = () => {
         {tweets.map((tweet) => {
           return <Tweet key={tweet.id} tweet={tweet} />;
         })}
-        {/* <button
-          onClick={() => void fetchNextPage()}
-          disabled={!hasNextPage || isFetching}
-        >
-          load next
-        </button> */}
+        {!hasNextPage && <p>No more items to load</p>}
       </div>
     </div>
   );

@@ -1,5 +1,10 @@
+import { object, z } from "zod";
 import { tweetSchema } from "./../../../utils/validation";
-import { createTRPCRouter, protectedProcedure } from "./../trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "./../trpc";
 
 export const tweetRouter = createTRPCRouter({
   createTweet: protectedProcedure
@@ -19,5 +24,27 @@ export const tweetRouter = createTRPCRouter({
           },
         },
       });
+    }),
+  timeline: publicProcedure
+    .input(
+      object({
+        cursor: z.string().nullish(),
+        limit: z.number().min(1).max(100).default(10),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { prisma } = ctx;
+      const { limit, cursor } = input;
+      const tweets = await prisma.tweet.findMany({
+        take: limit + 1,
+        orderBy: [
+          {
+            createdAt: "desc",
+          },
+        ],
+      });
+      return {
+        tweets,
+      };
     }),
 });

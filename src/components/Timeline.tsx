@@ -5,6 +5,7 @@ import Image from "next/image";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import updateLocal from "dayjs/plugin/updateLocale";
+import { useEffect, useState } from "react";
 dayjs.extend(relativeTime);
 dayjs.extend(updateLocal);
 dayjs.updateLocale("en", {
@@ -54,16 +55,44 @@ const Tweet = ({
     </div>
   );
 };
+const useScrollPosition = () => {
+  const [scrollPosition, setScrollPosition] = useState(0);
+  const handleScroll = () => {
+    const height =
+      document.documentElement.scrollHeight -
+      document.documentElement.clientHeight;
+    const winScroll =
+      document.body.scrollTop || document.documentElement.scrollTop;
+    const scrolled = (winScroll / height) * 100;
+    setScrollPosition(scrolled);
+  };
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+  return scrollPosition;
+};
 
 const Timeline = () => {
-  const {data, hasNextPage, fetchNextPage, isFetching} = api.tweet.timeline.useInfiniteQuery({
-    limit: 10,
-  },
-  {
-    getNextPageParam: (lastPage) => lastPage.nextCursor
-  });
-  const tweets = data?.pages.flatMap((page) => page.tweets) ?? []
-  console.log("dataaa", data);
+  const scrollPosition = useScrollPosition();
+  const { data, hasNextPage, fetchNextPage, isFetching } =
+    api.tweet.timeline.useInfiniteQuery(
+      {
+        limit: 10,
+      },
+      {
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
+      }
+    );
+  const tweets = data?.pages.flatMap((page) => page.tweets) ?? [];
+  useEffect(() => {
+    if (scrollPosition > 90 && hasNextPage && !isFetching) {
+      fetchNextPage();
+    }
+  }, [scrollPosition]);
+  console.log({ scrollPosition });
   return (
     <div>
       <CreateTweet />
@@ -71,7 +100,12 @@ const Timeline = () => {
         {tweets.map((tweet) => {
           return <Tweet key={tweet.id} tweet={tweet} />;
         })}
-        <button onClick={() => void fetchNextPage()} disabled={!hasNextPage || isFetching}>load next</button>
+        {/* <button
+          onClick={() => void fetchNextPage()}
+          disabled={!hasNextPage || isFetching}
+        >
+          load next
+        </button> */}
       </div>
     </div>
   );

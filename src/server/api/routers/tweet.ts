@@ -42,9 +42,25 @@ export const tweetRouter = createTRPCRouter({
             createdAt: "desc",
           },
         ],
+        cursor: cursor ? {id: cursor} : undefined,
+        include: {
+          author: {
+            select: {
+              name: true,
+              image: true,
+              id: true,
+            },
+          },
+        },
       });
+      let nextCursor: typeof cursor | undefined = undefined;
+      if (tweets.length > limit) {
+        const nextItem = tweets.pop() as (typeof tweets)[number];
+        nextCursor = nextItem.id;
+      }
       return {
         tweets,
+        nextCursor,
       };
     }),
 });

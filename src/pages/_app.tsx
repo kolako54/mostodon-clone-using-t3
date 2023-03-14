@@ -1,13 +1,13 @@
 import { type AppType } from "next/app";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { api } from "../utils/api";
 
 import "../styles/globals.css";
 import { Container } from "../components/Container";
 import LoggedOutBanner from "../components/LoggedOutBanner";
-
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
@@ -20,6 +20,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
         </main>
       </Container>
       <LoggedOutBanner />
+      <ReactQueryDevtools initialIsOpen={false} />
     </SessionProvider>
   );
 };

@@ -4,12 +4,17 @@ import { tweetSchema } from "../utils/validation";
 const CreateTweet = () => {
   const [text, setText] = useState("");
   const [error, setError] = useState("");
-  const { mutateAsync } = api.tweet.createTweet.useMutation();
+  const utils = api.useContext();
+  const { mutateAsync } = api.tweet.createTweet.useMutation({
+    onSuccess: () => {
+      utils.tweet.timeline.invalidate();
+    },
+  });
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await tweetSchema.parse({ text });
-      mutateAsync({ text });
+      await mutateAsync({ text });
     } catch (err) {
       setError(err.message);
       return;

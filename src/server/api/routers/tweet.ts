@@ -60,6 +60,11 @@ export const tweetRouter = createTRPCRouter({
               id: true,
             },
           },
+          _count: {
+            select: {
+              Likes: true,
+            },
+          },
         },
       });
       let nextCursor: typeof cursor | undefined = undefined;

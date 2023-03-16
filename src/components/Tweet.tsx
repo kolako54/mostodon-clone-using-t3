@@ -62,7 +62,7 @@ const Tweet = ({
             });
           }}
         />
-        <span className="text-sm text-gray-500">{10}</span>
+        <span className="text-sm text-gray-500">{tweet._count.Likes}</span>
       </div>
     </div>
   );

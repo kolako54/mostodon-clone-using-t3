@@ -27,6 +27,7 @@ export const useUpdateCache = ({
       const newData = oldData as InfiniteData<
         RouterOutputs["tweet"]["timeline"]
       >;
+      const value = action === "like" ? 1 : -1;
       const newTweets = newData.pages.map((page) => {
         return {
           tweets: page.tweets.map((tweet) => {
@@ -35,6 +36,9 @@ export const useUpdateCache = ({
                 ...tweet,
 
                 Likes: action === "like" ? [data.userId] : [],
+                _count: {
+                  Likes: tweet._count.Likes + value,
+                },
               };
             }
             return tweet;
